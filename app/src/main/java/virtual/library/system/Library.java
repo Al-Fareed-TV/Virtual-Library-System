@@ -57,7 +57,10 @@ public class Library {
         return bookList.stream()
                 .filter(book -> book.getTitle().equalsIgnoreCase(criteria) ||
                         book.getAuthor().equalsIgnoreCase(criteria) ||
-                        book.getIsbn().equalsIgnoreCase(criteria))
+                        book.getIsbn().equalsIgnoreCase(criteria) ||
+                        book.getGenre().equalsIgnoreCase(criteria) || 
+                        book.getPublicationDate().equals(LocalDate.parse(criteria)) 
+                        )
                 .collect(Collectors.toList());
     }
 
