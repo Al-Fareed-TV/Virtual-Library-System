@@ -10,16 +10,27 @@ import com.opencsv.exceptions.CsvValidationException;
 
 public class Library {
     Scanner input = new Scanner(System.in);
-    List<Book> bookList = new ArrayList<>();
-   List<Book> searchedBooks = new ArrayList<>();
+    private List<Book> bookList = new ArrayList<>();
+    List<Book> searchedBooks = new ArrayList<>();
     private Set<String> isbnSet;
 
-    public Library() {
+    public Library()throws CsvValidationException {
         this.isbnSet = new HashSet<>();
+        batchUploadFromCSV("/Users/testvagrant/Documents/Virtual-Library-System/app/src/main/resources/Books.csv");
+        // displayBooks();
     }
 
     private boolean isIsbnUnique(String isbn) {
         return isbnSet.add(isbn);
+    }
+    public List<Book> getListOfBooks(){
+        return bookList;
+    }
+    public void displayBooks(){
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s\n", "Title", "Author", "ISBN", "Genre", "Published Date", "No of copies");
+        for (Book book : bookList) {
+            System.out.printf("%-20s %-20s %-20s %-20s %s %d\n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
+        }
     }
 
     public void batchUploadFromCSV(String csvFilePath) throws CsvValidationException {
@@ -53,22 +64,24 @@ public class Library {
     }
 
     public List<Book> searchBooks(String criteria) {
-         searchedBooks =  bookList.stream()
+        searchedBooks = bookList.stream()
                 .filter(book -> book.getTitle().equalsIgnoreCase(criteria) ||
                         book.getAuthor().equalsIgnoreCase(criteria) ||
                         book.getIsbn().equalsIgnoreCase(criteria))
                 .collect(Collectors.toList());
-                return searchedBooks;
+        return searchedBooks;
     }
-    public List<Book> filterBooksByGenre(String genre){
+
+    public List<Book> filterBooksByGenre(String genre) {
         return searchedBooks.stream()
-        .filter(book -> book.getGenre().equalsIgnoreCase(genre))
-        .collect(Collectors.toList());
+                .filter(book -> book.getGenre().equalsIgnoreCase(genre))
+                .collect(Collectors.toList());
     }
-    public List<Book> filterBooksByPublicationDate(LocalDate date){
+
+    public List<Book> filterBooksByPublicationDate(LocalDate date) {
         return searchedBooks.stream()
-        .filter(book -> book.getPublicationDate().equals(date))
-        .collect(Collectors.toList());
+                .filter(book -> book.getPublicationDate().equals(date))
+                .collect(Collectors.toList());
     }
 
 }
