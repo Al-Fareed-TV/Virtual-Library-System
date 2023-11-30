@@ -5,14 +5,13 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.io.IOException;
-import java.text.ParseException;
-
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
 public class Library {
     Scanner input = new Scanner(System.in);
     List<Book> bookList = new ArrayList<>();
+   List<Book> searchedBooks = new ArrayList<>();
     private Set<String> isbnSet;
 
     public Library() {
@@ -54,14 +53,22 @@ public class Library {
     }
 
     public List<Book> searchBooks(String criteria) {
-        return bookList.stream()
+         searchedBooks =  bookList.stream()
                 .filter(book -> book.getTitle().equalsIgnoreCase(criteria) ||
                         book.getAuthor().equalsIgnoreCase(criteria) ||
-                        book.getIsbn().equalsIgnoreCase(criteria) ||
-                        book.getGenre().equalsIgnoreCase(criteria) || 
-                        book.getPublicationDate().equals(LocalDate.parse(criteria)) 
-                        )
+                        book.getIsbn().equalsIgnoreCase(criteria))
                 .collect(Collectors.toList());
+                return searchedBooks;
+    }
+    public List<Book> filterBooksByGenre(String genre){
+        return searchedBooks.stream()
+        .filter(book -> book.getGenre().equalsIgnoreCase(genre))
+        .collect(Collectors.toList());
+    }
+    public List<Book> filterBooksByPublicationDate(LocalDate date){
+        return searchedBooks.stream()
+        .filter(book -> book.getPublicationDate().equals(date))
+        .collect(Collectors.toList());
     }
 
 }
