@@ -7,6 +7,8 @@ import java.util.*;
 import com.opencsv.CSVReader;
 
 public class Library {
+    Scanner input = new Scanner(System.in);
+    List<Book> bookList = new ArrayList<>();
     private Set<String> isbnSet;
 
     public Library() {
@@ -31,7 +33,7 @@ public class Library {
                     LocalDate publicationDate = LocalDate.parse(nextRecord[4]);
                     int numberOfCopies = Integer.parseInt(nextRecord[5]);
 
-                    Book newBook = new Book(author, title, isbn, genre, publicationDate, numberOfCopies);
+                    bookList.add(new Book(author, title, isbn, genre, publicationDate, numberOfCopies));
                     booksAdded++;
                 }else{
                     booksSkipped++;
@@ -44,6 +46,19 @@ public class Library {
     }
     private void booksUploadedAndSkipped(int booksAdded, int booksSkipped){
         System.out.println("Number of Books Added : " + booksAdded+"\nNumber of books skipped : " + booksSkipped);
-
     }
+    public List<Book> searchBook() {
+        System.out.println("Enter Book Title/Author/ISBN ");
+        String criteria = input.nextLine();
+        List<Book> searchResults = new ArrayList<>();
+        for (Book book : bookList) {
+            if (book.getTitle().equalsIgnoreCase(criteria) || book.getAuthor().equalsIgnoreCase(criteria) || book.getIsbn().equalsIgnoreCase(criteria)) {
+                searchResults.add(book);
+            }
+        }
+        if(searchResults.size()<1)
+            System.out.println("No books found matching your "+criteria+"...!");
+        return searchResults;
+    }
+
 }

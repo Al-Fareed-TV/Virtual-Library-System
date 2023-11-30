@@ -24,5 +24,29 @@ public class Book {
         this.numberOfCopies = numberOfCopies;
     }
 
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public LocalDate getPublicationDate() {
+        return publicationDate;
+    }
+
+    public int getNumberOfCopies() {
+        return numberOfCopies;
+    }
+
     
 }
