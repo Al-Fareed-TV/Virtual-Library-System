@@ -3,6 +3,12 @@ package virtual.library.system;
 import java.util.*;
 
 public class Library {
- public static void main(String[] args) {
- }
+    private Set<String> isbnSet;
+    public Library() {
+        this.isbnSet = new HashSet<>();
+    }
+
+    public boolean isIsbnUnique(String isbn) {
+        return isbnSet.add(isbn);
+    }
 }
