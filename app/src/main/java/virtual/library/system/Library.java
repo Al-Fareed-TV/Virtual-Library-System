@@ -3,8 +3,12 @@ package virtual.library.system;
 import java.io.FileReader;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.io.IOException;
+import java.text.ParseException;
 
 import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 
 public class Library {
     Scanner input = new Scanner(System.in);
@@ -19,7 +23,7 @@ public class Library {
         return isbnSet.add(isbn);
     }
 
-    public void batchUploadFromCSV(String csvFilePath) throws Exception {
+    public void batchUploadFromCSV(String csvFilePath) throws CsvValidationException {
         int booksAdded = 0;
         int booksSkipped = 0;
         try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
@@ -35,30 +39,26 @@ public class Library {
 
                     bookList.add(new Book(author, title, isbn, genre, publicationDate, numberOfCopies));
                     booksAdded++;
-                }else{
+                } else {
                     booksSkipped++;
                 }
             }
             booksUploadedAndSkipped(booksAdded, booksSkipped);
-        } catch (Exception e) {
-            System.out.println(e.getLocalizedMessage());
+        } catch (IOException e) {
+            System.out.println("Error reading CSV file: " + e.getLocalizedMessage());
         }
     }
-    private void booksUploadedAndSkipped(int booksAdded, int booksSkipped){
-        System.out.println("Number of Books Added : " + booksAdded+"\nNumber of books skipped : " + booksSkipped);
+
+    private void booksUploadedAndSkipped(int booksAdded, int booksSkipped) {
+        System.out.println("Number of Books Added : " + booksAdded + "\nNumber of books skipped : " + booksSkipped);
     }
-    public List<Book> searchBook() {
-        System.out.println("Enter Book Title/Author/ISBN ");
-        String criteria = input.nextLine();
-        List<Book> searchResults = new ArrayList<>();
-        for (Book book : bookList) {
-            if (book.getTitle().equalsIgnoreCase(criteria) || book.getAuthor().equalsIgnoreCase(criteria) || book.getIsbn().equalsIgnoreCase(criteria)) {
-                searchResults.add(book);
-            }
-        }
-        if(searchResults.size()<1)
-            System.out.println("No books found matching your "+criteria+"...!");
-        return searchResults;
+
+    public List<Book> searchBooks(String criteria) {
+        return bookList.stream()
+                .filter(book -> book.getTitle().equalsIgnoreCase(criteria) ||
+                        book.getAuthor().equalsIgnoreCase(criteria) ||
+                        book.getIsbn().equalsIgnoreCase(criteria))
+                .collect(Collectors.toList());
     }
 
 }
