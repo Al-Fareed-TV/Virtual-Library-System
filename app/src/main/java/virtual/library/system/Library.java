@@ -28,9 +28,11 @@ public class Library {
         return bookList;
     }
 
-    public void displayBooks() {
-        System.out.printf("%-5s %-20s %-20s %-20s %-20s %-20s %-20s\n", "Title", "Author", "ISBN", "Genre",
+    public void displayAllBooks() {
+        System.out.printf("%-5s %-20s %-20s %-20s %-20s %-20s %-20s\n", "Sl No.", "Title", "Author", "ISBN", "Genre",
                 "Published Date", "No of copies");
+        System.out.println(
+                "---------------------------------------------------------------------------------------------------------------");
         int i = 0;
         for (Book book : bookList) {
             i++;
@@ -38,16 +40,23 @@ public class Library {
                     book.getIsbn(), book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
         }
     }
-    public void displaySelectedBook(Book selectedBook){
+
+    public void displaySelectedBook(Book selectedBook) {
         System.out.println("Title: " + selectedBook.getTitle());
         System.out.println("Author: " + selectedBook.getAuthor());
         System.out.println("ISBN: " + selectedBook.getIsbn());
         System.out.println("Genre: " + selectedBook.getGenre());
         System.out.println("Published Date: " + selectedBook.getPublicationDate());
-        System.out.println("Number of Copies: " + selectedBook.getNumberOfCopies());
-        String availability = selectedBook.getNumberOfCopies()<1?"Out Of Stock" : "Avilable copies : "+selectedBook.getNumberOfCopies();
-        System.out.println(availability);
+        displayAvailabilityOfBookSelectedBook(selectedBook);
     }
+
+    private void displayAvailabilityOfBookSelectedBook(Book selectedBook) {
+        String availability = selectedBook.getNumberOfCopies() < 1 ? "Out Of Stock"
+                : "Avilable copies : " + selectedBook.getNumberOfCopies();
+        System.out.println(availability);
+
+    }
+
     public void batchUploadFromCSV(String csvFilePath) throws CsvValidationException {
         int booksAdded = 0;
         int booksSkipped = 0;
@@ -59,20 +68,21 @@ public class Library {
                     String title = nextRecord[1];
                     String isbn = nextRecord[2];
                     String genre = nextRecord[3];
-                    
+
                     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                     LocalDate publicationDate = LocalDate.parse(nextRecord[4], dateFormatter);
-            
+
                     int numberOfCopies = Integer.parseInt(nextRecord[5]);
-                    System.out.println("Content from csv file : "+author+" "+ title+" "+  isbn+" "+  genre+" "+  publicationDate+" "+  numberOfCopies);
-            
+                    System.out.println("Content from csv file : " + author + " " + title + " " + isbn + " " + genre
+                            + " " + publicationDate + " " + numberOfCopies);
+
                     bookList.add(new Book(author, title, isbn, genre, publicationDate, numberOfCopies));
                     booksAdded++;
                 } else {
                     booksSkipped++;
                 }
             }
-            
+
             booksUploadedAndSkipped(booksAdded, booksSkipped);
         } catch (IOException e) {
             System.out.println("Error reading CSV file: " + e.getLocalizedMessage());
