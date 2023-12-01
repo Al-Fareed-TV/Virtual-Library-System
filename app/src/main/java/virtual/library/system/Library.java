@@ -47,15 +47,11 @@ public class Library {
         System.out.println("ISBN: " + selectedBook.getIsbn());
         System.out.println("Genre: " + selectedBook.getGenre());
         System.out.println("Published Date: " + selectedBook.getPublicationDate());
-        displayAvailabilityOfBookSelectedBook(selectedBook);
-    }
-
-    private void displayAvailabilityOfBookSelectedBook(Book selectedBook) {
         String availability = selectedBook.getNumberOfCopies() < 1 ? "Out Of Stock"
                 : "Avilable copies : " + selectedBook.getNumberOfCopies();
         System.out.println(availability);
-
     }
+
 
     public void batchUploadFromCSV(String csvFilePath) throws CsvValidationException {
         int booksAdded = 0;

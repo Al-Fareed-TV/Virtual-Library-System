@@ -14,7 +14,7 @@ public class Transaction {
 
         library.displayAllBooks();
 
-       System.out.print("Enter the index of the book you want to select : ");
+       System.out.print("Seelect a book from list : ");
        int index = input.nextInt();
        
        library.displaySelectedBook(bookList.get(index-1));
