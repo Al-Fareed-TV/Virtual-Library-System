@@ -17,7 +17,7 @@ public class Library {
 
     public Library() throws CsvValidationException {
         this.isbnSet = new HashSet<>();
-        batchUploadFromCSV("/Users/testvagrant/Documents/Virtual-Library-System/app/src/main/resources/Books.csv");
+        batchUploadFromCSV("app/src/main/resources/Books.csv");
     }
 
     private boolean isIsbnUnique(String isbn) {
@@ -29,14 +29,14 @@ public class Library {
     }
 
     public void displayAllBooks() {
-        System.out.printf("%-5s %-20s %-20s %-20s %-20s %-20s %-20s\n", "Sl No.", "Title", "Author", "ISBN", "Genre",
+        System.out.printf("%6s %-20s %-30s %-20s %-20s %-20s %-20s\n", "Sl No.", "Author", "Title", "ISBN", "Genre",
                 "Published Date", "No of copies");
         System.out.println(
-                "---------------------------------------------------------------------------------------------------------------");
+                "-------------------------------------------------------------------------------------------------------------------------------------------------");
         int i = 0;
         for (Book book : bookList) {
             i++;
-            System.out.printf("%d %-20s %-20s %-20s %-20s %s %d\n", i, book.getTitle(), book.getAuthor(),
+            System.out.printf("%-6d %-20s %-30s %-20s %-20s %-20s %d\n", i, book.getTitle(), book.getAuthor(),
                     book.getIsbn(), book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
         }
     }
@@ -73,9 +73,6 @@ public class Library {
                     LocalDate publicationDate = LocalDate.parse(nextRecord[4], dateFormatter);
 
                     int numberOfCopies = Integer.parseInt(nextRecord[5]);
-                    System.out.println("Content from csv file : " + author + " " + title + " " + isbn + " " + genre
-                            + " " + publicationDate + " " + numberOfCopies);
-
                     bookList.add(new Book(author, title, isbn, genre, publicationDate, numberOfCopies));
                     booksAdded++;
                 } else {

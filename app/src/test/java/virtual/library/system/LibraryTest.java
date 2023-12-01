@@ -1,5 +1,5 @@
 package virtual.library.system;
 
-public class Library {
+public class LibraryTest {
     
 }
