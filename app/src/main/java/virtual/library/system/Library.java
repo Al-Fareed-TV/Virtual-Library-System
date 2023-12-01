@@ -2,6 +2,7 @@ package virtual.library.system;
 
 import java.io.FileReader;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.io.IOException;
@@ -14,27 +15,39 @@ public class Library {
     List<Book> searchedBooks = new ArrayList<>();
     private Set<String> isbnSet;
 
-    public Library()throws CsvValidationException {
+    public Library() throws CsvValidationException {
         this.isbnSet = new HashSet<>();
         batchUploadFromCSV("/Users/testvagrant/Documents/Virtual-Library-System/app/src/main/resources/Books.csv");
-        // displayBooks();
     }
 
     private boolean isIsbnUnique(String isbn) {
         return isbnSet.add(isbn);
     }
-    public List<Book> getListOfBooks(){
+
+    public List<Book> getListOfBooks() {
         return bookList;
     }
-    public void displayBooks(){
-        System.out.printf("%-5s %-20s %-20s %-20s %-20s %-20s %-20s\n", "Title", "Author", "ISBN", "Genre", "Published Date", "No of copies");
-        int i=0;
+
+    public void displayBooks() {
+        System.out.printf("%-5s %-20s %-20s %-20s %-20s %-20s %-20s\n", "Title", "Author", "ISBN", "Genre",
+                "Published Date", "No of copies");
+        int i = 0;
         for (Book book : bookList) {
             i++;
-            System.out.printf("%d %-20s %-20s %-20s %-20s %s %d\n",i, book.getTitle(), book.getAuthor(), book.getIsbn(), book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
+            System.out.printf("%d %-20s %-20s %-20s %-20s %s %d\n", i, book.getTitle(), book.getAuthor(),
+                    book.getIsbn(), book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
         }
     }
-
+    public void displaySelectedBook(Book selectedBook){
+        System.out.println("Title: " + selectedBook.getTitle());
+        System.out.println("Author: " + selectedBook.getAuthor());
+        System.out.println("ISBN: " + selectedBook.getIsbn());
+        System.out.println("Genre: " + selectedBook.getGenre());
+        System.out.println("Published Date: " + selectedBook.getPublicationDate());
+        System.out.println("Number of Copies: " + selectedBook.getNumberOfCopies());
+        String availability = selectedBook.getNumberOfCopies()<1?"Out Of Stock" : "Avilable copies : "+selectedBook.getNumberOfCopies();
+        System.out.println(availability);
+    }
     public void batchUploadFromCSV(String csvFilePath) throws CsvValidationException {
         int booksAdded = 0;
         int booksSkipped = 0;
@@ -46,15 +59,20 @@ public class Library {
                     String title = nextRecord[1];
                     String isbn = nextRecord[2];
                     String genre = nextRecord[3];
-                    LocalDate publicationDate = LocalDate.parse(nextRecord[4]);
+                    
+                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    LocalDate publicationDate = LocalDate.parse(nextRecord[4], dateFormatter);
+            
                     int numberOfCopies = Integer.parseInt(nextRecord[5]);
-
+                    System.out.println("Content from csv file : "+author+" "+ title+" "+  isbn+" "+  genre+" "+  publicationDate+" "+  numberOfCopies);
+            
                     bookList.add(new Book(author, title, isbn, genre, publicationDate, numberOfCopies));
                     booksAdded++;
                 } else {
                     booksSkipped++;
                 }
             }
+            
             booksUploadedAndSkipped(booksAdded, booksSkipped);
         } catch (IOException e) {
             System.out.println("Error reading CSV file: " + e.getLocalizedMessage());
