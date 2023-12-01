@@ -11,13 +11,16 @@ public class Transaction {
         Library library = new Library();
         List<Book> bookList = library.getListOfBooks();
 
-        library.displayAllBooks();
+        library.displayAllBooks(bookList);
+        System.out.println("Enter Book's Title/Author/ISBN :");
+        String criteria = input.nextLine();
+         List<Book> searchedBooks = library.searchBooks(criteria);
+        library.displayAllBooks(searchedBooks);
+        System.out.print("Enter the book number for more details");
+        int selectedBookIndex = input.nextInt();
 
-        System.out.print("Please enter the number next to a book to view its details: ");
-        int selectedBookIndex = input.nextInt() - 1;
-
-        if (selectedBookIndex >= 0 && selectedBookIndex < bookList.size()) {
-            library.displaySelectedBook(bookList.get(selectedBookIndex));
+        if (selectedBookIndex > 0 && selectedBookIndex < bookList.size()) {
+            library.displaySelectedBook(searchedBooks.get(selectedBookIndex-1));
         } else {
             System.out.println("Invalid selection. Please choose a number from the list.");
         }

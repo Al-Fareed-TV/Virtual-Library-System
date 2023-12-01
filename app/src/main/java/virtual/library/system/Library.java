@@ -28,18 +28,25 @@ public class Library {
         return bookList;
     }
 
-    public void displayAllBooks() {
-        System.out.printf("%6s %-20s %-30s %-20s %-20s %-20s %-20s\n", "Sl No.", "Author", "Title", "ISBN", "Genre",
-                "Published Date", "No of copies");
-        System.out.println(
-                "-------------------------------------------------------------------------------------------------------------------------------------------------");
+    public void displayAllBooks(List<Book> books) {
+        String border = "+------+----------------------+------------------------------+----------------------+----------------------+----------------------+----------------------+";
+        String header = "| %-4s | %-20s | %-28s | %-20s | %-20s | %-20s | %-20s |\n";
+        String rowFormat = "| %-4d | %-20s | %-28s | %-20s | %-20s | %-20s | %d                  |\n";
+    
+        System.out.println(border);
+        System.out.printf(header, "Sl No.", "Author", "Title", "ISBN", "Genre", "Published Date", "No of copies");
+        System.out.println(border);
+    
         int i = 0;
-        for (Book book : bookList) {
+        for (Book book : books) {
             i++;
-            System.out.printf("%-6d %-20s %-30s %-20s %-20s %-20s %d\n", i, book.getTitle(), book.getAuthor(),
-                    book.getIsbn(), book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
+            System.out.printf(rowFormat, i, book.getAuthor(), book.getTitle(), book.getIsbn(),
+                    book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
         }
+    
+        System.out.println(border);
     }
+    
 
     public void displaySelectedBook(Book selectedBook) {
         System.out.println("Title: " + selectedBook.getTitle());
