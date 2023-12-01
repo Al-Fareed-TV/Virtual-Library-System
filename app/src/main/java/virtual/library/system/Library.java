@@ -27,9 +27,11 @@ public class Library {
         return bookList;
     }
     public void displayBooks(){
-        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s\n", "Title", "Author", "ISBN", "Genre", "Published Date", "No of copies");
+        System.out.printf("%-5s %-20s %-20s %-20s %-20s %-20s %-20s\n", "Title", "Author", "ISBN", "Genre", "Published Date", "No of copies");
+        int i=0;
         for (Book book : bookList) {
-            System.out.printf("%-20s %-20s %-20s %-20s %s %d\n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
+            i++;
+            System.out.printf("%d %-20s %-20s %-20s %-20s %s %d\n",i, book.getTitle(), book.getAuthor(), book.getIsbn(), book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
         }
     }
 

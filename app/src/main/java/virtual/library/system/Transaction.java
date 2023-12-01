@@ -13,27 +13,19 @@ public class Transaction {
         Scanner input = new Scanner(System.in);
         List<Book> bookList = library.getListOfBooks();
 
-        System.out.println("Enter a Book's Title/Author/ISBN");
-        String criteria = input.nextLine();
-        List<Book> filteredBooks = library.searchBooks(criteria);
+        library.displayBooks();
 
-        System.out.println("Do you want to filter by Genre? (y/n)");
-        if (input.next().equalsIgnoreCase("y")) {
-            System.out.println("Enter the Genre : ");
-            String genre = input.next();
-            filteredBooks = library.filterBooksByGenre(genre);
-        }
-
-        System.out.println("Do you want to filter by Publication date? (y/n)");
-        if (input.next().equalsIgnoreCase("y")) {
-            System.out.println("Enter the Publication date (YYYY-MM-DD) : ");
-            LocalDate publicationDate = LocalDate.parse(input.next());
-            filteredBooks = library.filterBooksByPublicationDate(publicationDate);
-        }
-
-        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s\n", "Title", "Author", "ISBN", "Genre", "Published Date", "No of copies");
-        for (Book book : filteredBooks) {
-            System.out.printf("%-20s %-20s %-20s %-20s %s %d\n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
-        }
+       System.out.print("Enter the index of the book you want to select : ");
+       int index = input.nextInt();
+       
+       Book selectedBook = bookList.get(index - 1);
+       System.out.println("Title: " + selectedBook.getTitle());
+       System.out.println("Author: " + selectedBook.getAuthor());
+       System.out.println("ISBN: " + selectedBook.getIsbn());
+       System.out.println("Genre: " + selectedBook.getGenre());
+       System.out.println("Published Date: " + selectedBook.getPublicationDate());
+       System.out.println("Number of Copies: " + selectedBook.getNumberOfCopies());
+        String availability = selectedBook.getNumberOfCopies()<1?"Out Of Stock" : "Avilable copies : "+selectedBook.getNumberOfCopies();
+       System.out.println(availability);
     }
 }
