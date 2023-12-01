@@ -32,33 +32,41 @@ public class Library {
         String border = "+------+----------------------+------------------------------+----------------------+----------------------+----------------------+----------------------+";
         String header = "| %-4s | %-20s | %-28s | %-20s | %-20s | %-20s | %-20s |\n";
         String rowFormat = "| %-4d | %-20s | %-28s | %-20s | %-20s | %-20s | %d                  |\n";
-    
+
         System.out.println(border);
         System.out.printf(header, "Sl No.", "Author", "Title", "ISBN", "Genre", "Published Date", "No of copies");
         System.out.println(border);
-    
+
         int i = 0;
         for (Book book : books) {
             i++;
             System.out.printf(rowFormat, i, book.getAuthor(), book.getTitle(), book.getIsbn(),
                     book.getGenre(), book.getPublicationDate().toString(), book.getNumberOfCopies());
         }
-    
+
         System.out.println(border);
     }
-    
 
     public void displaySelectedBook(Book selectedBook) {
-        System.out.println("Title: " + selectedBook.getTitle());
-        System.out.println("Author: " + selectedBook.getAuthor());
-        System.out.println("ISBN: " + selectedBook.getIsbn());
-        System.out.println("Genre: " + selectedBook.getGenre());
-        System.out.println("Published Date: " + selectedBook.getPublicationDate());
+        String border = String.join("", Collections.nCopies(72, "-"));
+        System.out.println(border);
+        System.out.printf("| %-10s | %-50s |\n", "Attribute", "Value");
+        System.out.println(border);
+        System.out.printf("| %-10s | %-50s |\n", "Title", selectedBook.getTitle());
+        System.out.printf("| %-10s | %-50s |\n", "Author", selectedBook.getAuthor());
+        System.out.printf("| %-10s | %-50s |\n", "ISBN", selectedBook.getIsbn());
+        System.out.printf("| %-10s | %-50s |\n", "Genre", selectedBook.getGenre());
+        System.out.printf("| %-10s | %-50s |\n", "Published Date", selectedBook.getPublicationDate());
+        System.out.println(border);
         String availability = selectedBook.getNumberOfCopies() < 1 ? "Out Of Stock"
                 : "Avilable copies : " + selectedBook.getNumberOfCopies();
         System.out.println(availability);
     }
 
+    public void displayAvailability(Book selectedBook) {
+        String availability = selectedBook.getNumberOfCopies() > 0 ? "Available Copies: "+selectedBook.getNumberOfCopies() : "Out of Stock";
+        System.out.println(availability);
+    }
 
     public void batchUploadFromCSV(String csvFilePath) throws CsvValidationException {
         int booksAdded = 0;

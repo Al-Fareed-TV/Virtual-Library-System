@@ -14,15 +14,15 @@ public class Transaction {
         library.displayAllBooks(bookList);
         System.out.println("Enter Book's Title/Author/ISBN :");
         String criteria = input.nextLine();
-         List<Book> searchedBooks = library.searchBooks(criteria);
+        List<Book> searchedBooks = library.searchBooks(criteria);
         library.displayAllBooks(searchedBooks);
-        System.out.print("Enter the book number for more details");
-        int selectedBookIndex = input.nextInt();
-
-        if (selectedBookIndex > 0 && selectedBookIndex < bookList.size()) {
-            library.displaySelectedBook(searchedBooks.get(selectedBookIndex-1));
+        System.out.print("Enter the book number for more details: ");
+        int bookIndex = input.nextInt() - 1; // Adjusting index to match list indexing
+        if (bookIndex >= 0 && bookIndex < searchedBooks.size()) {
+            Book selectedBook = searchedBooks.get(bookIndex);
+            library.displaySelectedBook(selectedBook);
         } else {
-            System.out.println("Invalid selection. Please choose a number from the list.");
+            System.out.println("Invalid selection. Please enter a valid book number.");
         }
 
     }
