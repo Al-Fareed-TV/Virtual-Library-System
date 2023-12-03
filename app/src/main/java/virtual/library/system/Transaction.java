@@ -32,26 +32,28 @@ public class Transaction {
         }
 
         System.out.println("Please enter the ISBN of the book : ");
-        String isbn = input.nextLine();
-        System.out.print("Title of the entered ISBN is : ");
-        List<Book> bookByISBN = library.searchBooks(criteria);
-        library.displayAllBooks(bookByISBN);
-        System.out.println("Confirm the Title of the book (y/n): ");
-        String confirmTitle = input.next();
-        if(confirmTitle.equalsIgnoreCase("y")){
-            System.out.println("Proceed(y)/Cancel(n)? : ");
-            char proceeed = input.next().charAt(0);
-            if(proceeed == 'y'){
-                System.out.println("Book issued...");
-            }else{
-                System.out.println("Canceled transaction");
-                input.close();
-                return;
-            }
-        }
-        else if(!confirmTitle.equalsIgnoreCase("n")){
-            System.out.println("Invalid option..");
-        }
+String isbn = input.nextLine();
+if (!isValidISBN(isbn)) {
+    System.out.println("Invalid ISBN format. Please enter a valid ISBN.");
+    return;
+}
+List<Book> bookByISBN = library.searchBooks(isbn);
+library.displayAllBooks(bookByISBN);
+System.out.println("Confirm the Title of the book (y/n): ");
+String confirmTitle = input.next();
+if (confirmTitle.equalsIgnoreCase("y")) {
+    System.out.println("Proceed(y)/Cancel(n)? : ");
+    char proceed = input.next().charAt(0);
+    if (proceed == 'y') {
+        System.out.println("Book issued...");
+    } else {
+        System.out.println("Canceled transaction");
+        input.close();
+        return;
+    }
+} else if (!confirmTitle.equalsIgnoreCase("n")) {
+    System.out.println("Invalid option..");
+}
         input.close();
     }
 }
