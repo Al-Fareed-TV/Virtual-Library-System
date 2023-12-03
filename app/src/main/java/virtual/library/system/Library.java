@@ -57,13 +57,11 @@ public class Library {
         System.out.printf("| %-10s | %-50s |\n", "ISBN", selectedBook.getIsbn());
         System.out.printf("| %-10s | %-50s |\n", "Genre", selectedBook.getGenre());
         System.out.printf("| %-10s | %-50s |\n", "Published Date", selectedBook.getPublicationDate());
+        displayAvailability(selectedBook);
         System.out.println(border);
-        String availability = selectedBook.getNumberOfCopies() < 1 ? "Out Of Stock"
-                : "Avilable copies : " + selectedBook.getNumberOfCopies();
-        System.out.println(availability);
     }
 
-    public void displayAvailability(Book selectedBook) {
+    private void displayAvailability(Book selectedBook) {
         String availability = selectedBook.getNumberOfCopies() > 0 ? "Available Copies: "+selectedBook.getNumberOfCopies() : "Out of Stock";
         System.out.println(availability);
     }
