@@ -1,19 +1,17 @@
 package virtual.library.system;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.HashMap;
-import java.util.stream.Collectors;
-
 import com.opencsv.exceptions.CsvValidationException;
+
+import java.io.*;
+import java.time.LocalDate;
+import java.util.*;
 
 public class Transaction {
     private static final Scanner input = new Scanner(System.in);
-    private static final Map<String, String> transactionLog = new HashMap<>();
+    private static final List<TransactionRecord> transactionLog = new ArrayList<>();
 
     private static boolean isValidISBN(String isbn) {
+        // A more robust ISBN validation can be implemented here
         return isbn.matches("[0-9-]+") && isbn.replaceAll("-", "").length() == 13;
     }
 
@@ -91,14 +89,18 @@ public class Transaction {
     }
 
     private static void recordTransaction(String userId, String isbn) {
-        Date borrowingDate = new Date();
-        transactionLog.put(userId, "ISBN: " + isbn + ", Borrowing Date: " + borrowingDate);
+        LocalDate borrowingDate = LocalDate.now();
+        TransactionRecord transaction = new TransactionRecord(userId, isbn, borrowingDate);
+        transactionLog.add(transaction);
+        // Additional logic to store the transaction persistently (e.g., in a file or database) can be added here
     }
 
     public static void viewTransactionLog() {
         System.out.println("Transaction Log:");
-        for (Map.Entry<String, String> entry : transactionLog.entrySet()) {
-            System.out.println("User ID: " + entry.getKey() + ", Transaction: " + entry.getValue());
+        for (TransactionRecord transaction : transactionLog) {
+            System.out.println("User ID: " + transaction.getUserId() +
+                    ", ISBN: " + transaction.getIsbn() +
+                    ", Borrowing Date: " + transaction.getBorrowingDate());
         }
     }
 }
