@@ -5,10 +5,18 @@ import com.opencsv.exceptions.CsvValidationException;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.time.format.DateTimeFormatter;
 
 public class Transaction {
     private static final Scanner input = new Scanner(System.in);
     private static final List<TransactionRecord> transactionLog = new ArrayList<>();
+    private static final String TRANSACTION_FILE_PATH = "app/src/main/resources/Transactions.csv";
 
     private static boolean isValidISBN(String isbn) {
         // A more robust ISBN validation can be implemented here
@@ -91,16 +99,32 @@ public class Transaction {
     private static void recordTransaction(String userId, String isbn) {
         LocalDate borrowingDate = LocalDate.now();
         TransactionRecord transaction = new TransactionRecord(userId, isbn, borrowingDate);
-        transactionLog.add(transaction);
-        // Additional logic to store the transaction persistently (e.g., in a file or database) can be added here
+        saveTransaction(transaction);
+    }
+    private static void saveTransaction(TransactionRecord transaction) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE_PATH, true))) {
+            writer.write(String.format("%s,%s,%s%n",
+                    transaction.getUserId(), transaction.getIsbn(),
+                    transaction.getBorrowingDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
+        } catch (IOException e) {
+            System.out.println("Error saving transaction: " + e.getMessage());
+        }
     }
 
-    public static void viewTransactionLog() {
-        System.out.println("Transaction Log:");
-        for (TransactionRecord transaction : transactionLog) {
-            System.out.println("User ID: " + transaction.getUserId() +
-                    ", ISBN: " + transaction.getIsbn() +
-                    ", Borrowing Date: " + transaction.getBorrowingDate());
+    public static void viewTransactionsForAdmin() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(TRANSACTION_FILE_PATH))) {
+            String line;
+            System.out.println("Transaction Log:");
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                String userId = parts[0];
+                String isbn = parts[1];
+                LocalDate borrowingDate = LocalDate.parse(parts[2], DateTimeFormatter.ISO_LOCAL_DATE);
+
+                System.out.printf("User ID: %s, ISBN: %s, Borrowing Date: %s%n", userId, isbn, borrowingDate);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading transactions: " + e.getMessage());
         }
     }
 }
