@@ -72,7 +72,7 @@ public class Transaction {
                     book.decrementCountOfBooks();
                     updateBookInLibrary(library, book);
                 } else {
-                    book.setOutOFStock(false);
+                    book.setInStock(false);
                     System.out.println("Out of stock");
                 }
             } else {
