@@ -55,16 +55,20 @@ public class Book {
         this.inStock = status;
     }
     public void decrementCountOfBooks() {
-        if(this.numberOfCopies > 0) {
+        if (this.numberOfCopies > 0) {
             this.numberOfCopies--;
-            this.inStock = this.numberOfCopies > 0;
-        } else {
-            System.out.println("Out of stock");
         }
+        updateStockStatus(); 
     }
 
     public boolean isOutOfStockStatus() {
         return inStock;
+    }
+    private void updateStockStatus() {
+        this.inStock = (this.numberOfCopies > 0);
+        if (!this.inStock) {
+            System.out.println("Out of stock"); 
+        }
     }
     
     
