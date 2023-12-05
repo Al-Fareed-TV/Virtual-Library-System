@@ -69,7 +69,7 @@ public class Transaction {
             if (optionalBook.isPresent()) {
                 Book book = optionalBook.get();
 
-                if (book.getOutOfStocksStatus()) {
+                if (!book.getOutOfStocksStatus()) {
                     book.decrementNumberOfCopies();
                     updateBookInLibrary(library, book);
                 } else {
