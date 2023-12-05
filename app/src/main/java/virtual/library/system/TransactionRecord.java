@@ -1,7 +1,5 @@
 package virtual.library.system;
-import java.io.*;
 import java.time.LocalDate;
-import java.util.*;
 public class TransactionRecord {
     private String userId;
     private LocalDate borrowedDate;

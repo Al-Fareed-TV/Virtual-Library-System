@@ -1,8 +1,7 @@
 package virtual.library.system;
 
 import java.time.LocalDate;
-import com.opencsv.CSVReader;
-import java.io.FileReader;
+
 
 public class Book {
     private String author;
@@ -55,7 +54,7 @@ public class Book {
     public void setOutOFStock(boolean status){
         this.outOfStockStatus = status;
     }
-    public void decrementNumberOfCopies() {
+    public void decrementCountOfBooks() {
         this.numberOfCopies--;
     }
 

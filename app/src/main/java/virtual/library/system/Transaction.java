@@ -9,7 +9,6 @@ import java.util.*;
 
 public class Transaction {
     private static final Scanner input = new Scanner(System.in);
-    private static final List<TransactionRecord> transactionLog = new ArrayList<>();
     private static final String TRANSACTION_FILE_PATH = "app/src/main/resources/Transactions.csv";
 
     private static boolean isValidISBN(String isbn) {
@@ -70,7 +69,7 @@ public class Transaction {
                 Book book = optionalBook.get();
 
                 if (!book.getOutOfStocksStatus()) {
-                    book.decrementNumberOfCopies();
+                    book.decrementCountOfBooks();
                     updateBookInLibrary(library, book);
                 } else {
                     book.setOutOFStock(false);
