@@ -56,7 +56,9 @@ public class Book {
     }
     public void decrementCountOfBooks() {
         if(this.numberOfCopies>0)
-        this.numberOfCopies--;
+            this.numberOfCopies--;
+        else
+            System.out.println("Out of stock");
     }
 
     public boolean isOutOfStockStatus() {
