@@ -55,6 +55,7 @@ public class Book {
         this.outOfStockStatus = status;
     }
     public void decrementCountOfBooks() {
+        if(this.numberOfCopies>0)
         this.numberOfCopies--;
     }
 
