@@ -73,7 +73,7 @@ public class Transaction {
                     book.decrementNumberOfCopies();
                     updateBookInLibrary(library, book);
                 } else {
-                    System.out.println("No available copies of the book.");
+                    System.out.println("Out of stock");
                 }
             } else {
                 System.out.println("Book with ISBN " + isbn + " not found.");
