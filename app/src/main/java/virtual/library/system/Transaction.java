@@ -4,14 +4,8 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.util.*;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.File;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class Transaction {
     private static final Scanner input = new Scanner(System.in);
@@ -54,6 +48,7 @@ public class Transaction {
             String userId = getUserInput("Enter your User ID:");
             if (confirmAction("Proceed (y/n)?")) {
                 recordTransaction(userId, isbn);
+                decrementNumberOfCopies(library, isbn);
                 System.out.println("Book issued...");
             } else {
                 System.out.println("Canceled transaction");
@@ -65,6 +60,41 @@ public class Transaction {
         }
 
         input.close();
+    }
+
+    private static void decrementNumberOfCopies(Library library, String isbn) {
+        try {
+            Optional<Book> optionalBook = findBookByISBN(library, isbn);
+
+            if (optionalBook.isPresent()) {
+                Book book = optionalBook.get();
+
+                if (book.getNumberOfCopies() > 0) {
+                    book.decrementNumberOfCopies();
+                    updateBookInLibrary(library, book);
+                } else {
+                    System.out.println("No available copies of the book.");
+                }
+            } else {
+                System.out.println("Book with ISBN " + isbn + " not found.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error decrementing number of copies: " + e.getMessage());
+        }
+    }
+
+    private static Optional<Book> findBookByISBN(Library library, String isbn) {
+        return library.getListOfBooks().stream()
+                .filter(book -> book.getIsbn().equalsIgnoreCase(isbn))
+                .findFirst();
+    }
+
+    private static void updateBookInLibrary(Library library, Book book) {
+        List<Book> books = library.getListOfBooks();
+        int index = books.indexOf(book);
+        if (index != -1) {
+            books.set(index, book);
+        }
     }
 
     private static Library initializeLibrary() {
@@ -101,6 +131,7 @@ public class Transaction {
         TransactionRecord transaction = new TransactionRecord(userId, isbn, borrowingDate);
         saveTransaction(transaction);
     }
+
     private static void saveTransaction(TransactionRecord transaction) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE_PATH, true))) {
             writer.write(String.format("%s,%s,%s%n",

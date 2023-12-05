@@ -47,6 +47,9 @@ public class Book {
     public int getNumberOfCopies() {
         return numberOfCopies;
     }
-
+    public void decrementNumberOfCopies() {
+        this.numberOfCopies--;
+    }
+    
     
 }
