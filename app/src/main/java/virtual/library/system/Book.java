@@ -11,6 +11,7 @@ public class Book {
     private String genre;
     private LocalDate publicationDate;
     private int numberOfCopies;
+    private boolean outOfStockStatus;
 
     public Book() {
     }
@@ -22,6 +23,7 @@ public class Book {
         this.genre = genre;
         this.publicationDate = publicationDate;
         this.numberOfCopies = numberOfCopies;
+        this.outOfStockStatus = true;
     }
 
     public String getAuthor() {
@@ -47,8 +49,18 @@ public class Book {
     public int getNumberOfCopies() {
         return numberOfCopies;
     }
+    public boolean getOutOfStocksStatus(){
+        return numberOfCopies>0;
+    }
+    public void setOutOFStock(boolean status){
+        this.outOfStockStatus = status;
+    }
     public void decrementNumberOfCopies() {
         this.numberOfCopies--;
+    }
+
+    public boolean isOutOfStockStatus() {
+        return outOfStockStatus;
     }
     
     

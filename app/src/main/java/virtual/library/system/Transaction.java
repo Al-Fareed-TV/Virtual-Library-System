@@ -69,10 +69,11 @@ public class Transaction {
             if (optionalBook.isPresent()) {
                 Book book = optionalBook.get();
 
-                if (book.getNumberOfCopies() > 0) {
+                if (book.getOutOfStocksStatus()) {
                     book.decrementNumberOfCopies();
                     updateBookInLibrary(library, book);
                 } else {
+                    book.setOutOFStock(false);
                     System.out.println("Out of stock");
                 }
             } else {
