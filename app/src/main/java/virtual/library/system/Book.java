@@ -59,8 +59,12 @@ public class Book {
         updateStockStatus(); 
     }
 
-    public boolean isInStock(){
+    public boolean isInStock() {
         return numberOfCopies > 0;
+    }
+
+    public void displayStockStatus() {
+        System.out.println(isInStock() ? "In Stock" : "Out of Stock");
     }
     private void updateStockStatus() {
         this.inStock = (this.numberOfCopies > 0);
@@ -68,6 +72,13 @@ public class Book {
             System.out.println("Out of stock"); 
         }
     }
-    
+    public boolean borrowBook() {
+        if (isInStock()) {
+            decrementCountOfBooks();
+            return true;
+        } else {
+            return false;
+        }
+    }
     
 }

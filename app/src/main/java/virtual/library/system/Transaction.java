@@ -12,7 +12,6 @@ public class Transaction {
     private static final String TRANSACTION_FILE_PATH = "app/src/main/resources/Transactions.csv";
 
     private static boolean isValidISBN(String isbn) {
-        // A more robust ISBN validation can be implemented here
         return isbn.matches("[0-9-]+") && isbn.replaceAll("-", "").length() == 13;
     }
 
@@ -80,9 +79,20 @@ public class Transaction {
         if (confirmAction("Confirm the Title of the book (y/n):")) {
             String userId = getUserInput("Enter your User ID:");
             if (confirmAction("Proceed (y/n)?")) {
-                recordTransaction(userId, isbn);
-                decrementNumberOfCopies(library, isbn);
-                System.out.println("Book issued...");
+                Optional<Book> optionalBook = findBookByISBN(library, isbn);
+                if (optionalBook.isPresent()) {
+                    Book book = optionalBook.get();
+                    if (book.borrowBook()) {
+                        recordTransaction(userId, isbn);
+                        System.out.println("Book issued...");
+                    } else {
+                        System.out.println("Book is out of stock.");
+                        // Offer options to the user
+                        handleOutOfStockOptions(library);
+                    }
+                } else {
+                    System.out.println("Book with ISBN " + isbn + " not found.");
+                }
             } else {
                 System.out.println("Canceled transaction");
             }
@@ -92,28 +102,24 @@ public class Transaction {
     }
 
     private static void returnBookFlow(Library library) {
-        System.out.println("Returning a book functionality is not implemented yet.");
+        System.out.println("Returned the book");
     }
 
-    private static void decrementNumberOfCopies(Library library, String isbn) {
-        try {
-            Optional<Book> optionalBook = findBookByISBN(library, isbn);
+    private static void handleOutOfStockOptions(Library library) {
+        System.out.println("Options:");
+        System.out.println("1. Return to Main Menu");
+        System.out.println("2. Perform Another Search");
 
-            if (optionalBook.isPresent()) {
-                Book book = optionalBook.get();
-
-                if (book.isInStock()) {
-                    book.decrementCountOfBooks();
-                    updateBookInLibrary(library, book);
-                } else {
-                    book.setInStock(false);
-                    System.out.println("Out of stock");
-                }
-            } else {
-                System.out.println("Book with ISBN " + isbn + " not found.");
-            }
-        } catch (Exception e) {
-            System.out.println("Error decrementing number of copies: " + e.getMessage());
+        String option = getUserInput("Select an option:");
+        switch (option) {
+            case "1":
+                break;
+            case "2":
+                searchBooksFlow(library);
+                break;
+            default:
+                System.out.println("Invalid option. Returning to the main menu.");
+                break;
         }
     }
 
@@ -123,11 +129,19 @@ public class Transaction {
                 .findFirst();
     }
 
-    private static void updateBookInLibrary(Library library, Book book) {
-        List<Book> books = library.getListOfBooks();
-        int index = books.indexOf(book);
-        if (index != -1) {
-            books.set(index, book);
+    private static void recordTransaction(String userId, String isbn) {
+        LocalDate borrowingDate = LocalDate.now();
+        TransactionRecord transaction = new TransactionRecord(userId, isbn, borrowingDate);
+        saveTransaction(transaction);
+    }
+
+    private static void saveTransaction(TransactionRecord transaction) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE_PATH, true))) {
+            writer.write(String.format("%s,%s,%s%n",
+                    transaction.getUserId(), transaction.getIsbn(),
+                    transaction.getBorrowingDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
+        } catch (IOException e) {
+            System.out.println("Error saving transaction: " + e.getMessage());
         }
     }
 
@@ -158,38 +172,5 @@ public class Transaction {
         System.out.print(prompt);
         String response = input.nextLine();
         return response.equalsIgnoreCase("y");
-    }
-
-    private static void recordTransaction(String userId, String isbn) {
-        LocalDate borrowingDate = LocalDate.now();
-        TransactionRecord transaction = new TransactionRecord(userId, isbn, borrowingDate);
-        saveTransaction(transaction);
-    }
-
-    private static void saveTransaction(TransactionRecord transaction) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE_PATH, true))) {
-            writer.write(String.format("%s,%s,%s%n",
-                    transaction.getUserId(), transaction.getIsbn(),
-                    transaction.getBorrowingDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
-        } catch (IOException e) {
-            System.out.println("Error saving transaction: " + e.getMessage());
-        }
-    }
-
-    public static void viewTransactionsForAdmin() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(TRANSACTION_FILE_PATH))) {
-            String line;
-            System.out.println("Transaction Log:");
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                String userId = parts[0];
-                String isbn = parts[1];
-                LocalDate borrowingDate = LocalDate.parse(parts[2], DateTimeFormatter.ISO_LOCAL_DATE);
-
-                System.out.printf("User ID: %s, ISBN: %s, Borrowing Date: %s%n", userId, isbn, borrowingDate);
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading transactions: " + e.getMessage());
-        }
     }
 }
