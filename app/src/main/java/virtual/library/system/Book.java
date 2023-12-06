@@ -48,9 +48,7 @@ public class Book {
     public int getNumberOfCopies() {
         return numberOfCopies;
     }
-    public boolean getOutOfStocksStatus(){
-        return numberOfCopies>0;
-    }
+    
     public void setInStock(boolean status){
         this.inStock = status;
     }
@@ -61,8 +59,8 @@ public class Book {
         updateStockStatus(); 
     }
 
-    public boolean isOutOfStockStatus() {
-        return inStock;
+    public boolean isInStock(){
+        return numberOfCopies > 0;
     }
     private void updateStockStatus() {
         this.inStock = (this.numberOfCopies > 0);

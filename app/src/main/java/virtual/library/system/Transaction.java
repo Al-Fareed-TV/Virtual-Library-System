@@ -19,6 +19,38 @@ public class Transaction {
     public static void main(String[] args) {
         Library library = initializeLibrary();
 
+        String option;
+        do {
+            System.out.println("** Library Menu **");
+            System.out.println("1. Search Books");
+            System.out.println("2. Borrow a Book");
+            System.out.println("3. Return a Book");
+            System.out.println("0. Exit");
+            option = getUserInput("Select an option:");
+
+            switch (option) {
+                case "1":
+                    searchBooksFlow(library);
+                    break;
+                case "2":
+                    borrowBookFlow(library);
+                    break;
+                case "3":
+                    returnBookFlow(library);
+                    break;
+                case "0":
+                    System.out.println("Thank you for using the library system.");
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+                    break;
+            }
+        } while (!option.equals("0"));
+
+        input.close();
+    }
+
+    private static void searchBooksFlow(Library library) {
         List<Book> bookList = library.getListOfBooks();
         library.displayAllBooks(bookList);
 
@@ -33,7 +65,9 @@ public class Transaction {
         } else {
             System.out.println("Invalid selection. Please enter a valid book number.");
         }
+    }
 
+    private static void borrowBookFlow(Library library) {
         String isbn = getUserInput("Please enter the ISBN of the book:");
         if (!isValidISBN(isbn)) {
             System.out.println("Invalid ISBN format. Please enter a valid ISBN.");
@@ -51,14 +85,14 @@ public class Transaction {
                 System.out.println("Book issued...");
             } else {
                 System.out.println("Canceled transaction");
-                input.close();
-                return;
             }
         } else {
             System.out.println("Invalid option.");
         }
+    }
 
-        input.close();
+    private static void returnBookFlow(Library library) {
+        System.out.println("Returning a book functionality is not implemented yet.");
     }
 
     private static void decrementNumberOfCopies(Library library, String isbn) {
@@ -68,7 +102,7 @@ public class Transaction {
             if (optionalBook.isPresent()) {
                 Book book = optionalBook.get();
 
-                if (!book.getOutOfStocksStatus()) {
+                if (book.isInStock()) {
                     book.decrementCountOfBooks();
                     updateBookInLibrary(library, book);
                 } else {
