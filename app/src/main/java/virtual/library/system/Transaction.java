@@ -17,6 +17,10 @@ public class Transaction {
         return isbn.matches("[0-9-]+") && isbn.replaceAll("-", "").length() == 13;
     }
 
+    private static TransactionRecord transaction;
+    private static List<Book> bookList;
+
+
     public static void main(String[] args) {
         Library library = initializeLibrary();
 
@@ -50,9 +54,8 @@ public class Transaction {
 
         input.close();
     }
-
     private static void searchBooksFlow(Library library) {
-        List<Book> bookList = library.getListOfBooks();
+        bookList = library.getListOfBooks();
         library.displayAllBooks(bookList);
 
         String criteria = getUserInput("Enter Book's Title/Author/ISBN:");
@@ -79,7 +82,7 @@ public class Transaction {
         library.displayAllBooks(bookByISBN);
 
         if (confirmAction("Confirm the Title of the book (y/n):")) {
-            String userId = getUserInput("Enter your User ID:");
+            int userId = Integer.parseInt(getUserInput("Enter your User ID:"));
             if (confirmAction("Proceed (y/n)?")) {
                 Optional<Book> optionalBook = findBookByISBN(library, isbn);
                 if (optionalBook.isPresent()) {
@@ -88,7 +91,8 @@ public class Transaction {
                         recordTransaction(userId, isbn);
                         System.out.println("Book issued...");
                     } else {
-                        System.out.println("Sorry, the book you are trying to borrow is currently out of stock. Please try again later or select another book.");
+                        System.out.println(
+                                "Sorry, the book you are trying to borrow is currently out of stock. Please try again later or select another book.");
                         handleOutOfStockOptions(library);
                     }
                 } else {
@@ -102,15 +106,23 @@ public class Transaction {
         }
     }
 
+    private static boolean isUser(int userId) {
+        return transaction.getUserId() == userId;
+    }
+
     private static void returnBookFlow(Library library) {
-        System.out.println("Enter the user id : ");
-        int uid = input.nextInt();
-        System.out.println("Enter the isbn of the book : ");
-        String isbnOfReturningBook = input.nextLine();
-        if(isValidIsbn() && isUser()){
-            book.returnBook();
-        }else{
-            System.out.println("Entered isbn is invalid");
+        int userId = Integer.parseInt(getUserInput("Enter the user id : "));
+        if (!isUser(userId)) {
+            System.out.println("Entered user id doesnot exist..!");
+           return;
+        }
+        String isbnOfReturningBook = getUserInput("Enter the isbn of the book : ");
+        if (isValidISBN(isbnOfReturningBook)) {
+            ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(isbnOfReturningBook, isbnOfReturningBook);
+            returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
+            System.out.println("Book returned successfully");
+        } else {
+            System.out.println("Entered isbn is invalid..! Please enter the valid isbn");
         }
 
         System.out.println("Returned the book");
@@ -121,7 +133,7 @@ public class Transaction {
         System.out.println("Options:");
         System.out.println("1. Return to Main Menu");
         System.out.println("2. Perform Another Search");
-    
+
         String option = getUserInput("Select an option:");
         switch (option) {
             case "1":
@@ -134,7 +146,6 @@ public class Transaction {
                 break;
         }
     }
-    
 
     private static Optional<Book> findBookByISBN(Library library, String isbn) {
         return library.getListOfBooks().stream()
@@ -142,7 +153,7 @@ public class Transaction {
                 .findFirst();
     }
 
-    private static void recordTransaction(String userId, String isbn) {
+    private static void recordTransaction(int userId, String isbn) {
         LocalDate borrowingDate = LocalDate.now();
         TransactionRecord transaction = new TransactionRecord(userId, isbn, borrowingDate);
         saveTransaction(transaction);

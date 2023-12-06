@@ -1,12 +1,12 @@
 package virtual.library.system;
 import java.time.LocalDate;
 public class TransactionRecord {
-    private String userId;
+    private int userId;
     private LocalDate borrowedDate;
     private String isbn;
     public TransactionRecord() {
     }
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
     public LocalDate getBorrowingDate() {
@@ -15,7 +15,7 @@ public class TransactionRecord {
     public String getIsbn() {
         return isbn;
     }
-    public TransactionRecord(String userId,String isbn, LocalDate borrowedDate ) {
+    public TransactionRecord(int userId,String isbn, LocalDate borrowedDate ) {
         this.userId = userId;
         this.borrowedDate = borrowedDate;
         this.isbn = isbn;
