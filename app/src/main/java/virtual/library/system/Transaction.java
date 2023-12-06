@@ -104,6 +104,16 @@ public class Transaction {
     }
 
     private static void returnBookFlow(Library library) {
+        System.out.println("Enter the user id : ");
+        int uid = input.nextInt();
+        System.out.println("Enter the isbn of the book : ");
+        String isbnOfReturningBook = input.nextLine();
+        if(isValidIsbn() && isUser()){
+            book.returnBook();
+        }else{
+            System.out.println("Entered isbn is invalid");
+        }
+
         System.out.println("Returned the book");
     }
 
