@@ -106,10 +106,11 @@ public class Transaction {
     }
 
     private static void handleOutOfStockOptions(Library library) {
+        System.out.println("Book is out of stock.");
         System.out.println("Options:");
         System.out.println("1. Return to Main Menu");
         System.out.println("2. Perform Another Search");
-
+    
         String option = getUserInput("Select an option:");
         switch (option) {
             case "1":
@@ -122,6 +123,7 @@ public class Transaction {
                 break;
         }
     }
+    
 
     private static Optional<Book> findBookByISBN(Library library, String isbn) {
         return library.getListOfBooks().stream()
