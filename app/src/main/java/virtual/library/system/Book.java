@@ -2,7 +2,7 @@ package virtual.library.system;
 
 import java.time.LocalDate;
 
-
+// This is a book class
 public class Book {
     private String author;
     private String title;
