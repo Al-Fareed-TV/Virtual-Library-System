@@ -88,8 +88,7 @@ public class Transaction {
                         recordTransaction(userId, isbn);
                         System.out.println("Book issued...");
                     } else {
-                        System.out.println("Book is out of stock.");
-                        // Offer options to the user
+                        System.out.println("Sorry, the book you are trying to borrow is currently out of stock. Please try again later or select another book.");
                         handleOutOfStockOptions(library);
                     }
                 } else {

@@ -22,7 +22,6 @@ public class Book {
         this.genre = genre;
         this.publicationDate = publicationDate;
         this.numberOfCopies = numberOfCopies;
-        this.inStock = true;
     }
 
     public String getAuthor() {
