@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+// This is transaction file
+
 public class Transaction {
     private static final Scanner input = new Scanner(System.in);
     private static final String TRANSACTION_FILE_PATH = "app/src/main/resources/Transactions.csv";
