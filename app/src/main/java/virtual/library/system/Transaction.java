@@ -122,6 +122,7 @@ public class Transaction {
             return;
         }
         String isbnOfReturningBook = getUserInput("Enter the isbn of the book : ");
+        //validates the ISBN of the book they are trying to return, checks whether the input of isbn is present in borrowed book .
         if(!transaction.getIsbn().equals(isbnOfReturningBook)){
             System.out.println("This user did not borrowed the book with isbn = "+isbnOfReturningBook+"\n Please enter the isbn of borrowed book..!");
             return;
