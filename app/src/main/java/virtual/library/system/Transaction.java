@@ -136,8 +136,7 @@ public class Transaction {
         }
         Optional<Book> optionalBook = findBookByISBN(library, isbnOfReturningBook);
         String message = "Are you sure. Want to return the book?(y/n)";
-        if (optionalBook.isPresent() && confirmUser(message)) {
-            
+        if (optionalBook.isPresent() && confirmReturn(message)) {
             String title = optionalBook.get().getTitle();
             ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(userId, isbnOfReturningBook, title);
             returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
@@ -146,7 +145,7 @@ public class Transaction {
             System.out.println("Book with ISBN " + isbnOfReturningBook + " not found.");
         }
     }
-    private static boolean confirmUser(String message){
+    private static boolean confirmReturn(String message){
         String userInput = getUserInput(message);
         if(userInput.equalsIgnoreCase("y")){
             return true;
