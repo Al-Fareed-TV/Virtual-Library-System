@@ -6,6 +6,8 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 
 // This is transaction file
 
@@ -20,10 +22,9 @@ public class Transaction {
     private static TransactionRecord transaction;
     private static List<Book> bookList;
 
-
     public static void main(String[] args) {
         Library library = initializeLibrary();
-
+        try{
         String option;
         do {
             System.out.println("** Library Menu **");
@@ -51,9 +52,13 @@ public class Transaction {
                     break;
             }
         } while (!option.equals("0"));
+    }catch(CsvValidationException e){
+        System.out.println("CSV validation");
+    }
 
         input.close();
     }
+
     private static void searchBooksFlow(Library library) {
         bookList = library.getListOfBooks();
         library.displayAllBooks(bookList);
@@ -110,17 +115,31 @@ public class Transaction {
         return transaction.getUserId() == userId;
     }
 
-    private static void returnBookFlow(Library library) {
+    private static void returnBookFlow(Library library) throws CsvValidationException {
         int userId = Integer.parseInt(getUserInput("Enter the user id : "));
         if (!isUser(userId)) {
             System.out.println("Entered user id doesnot exist..!");
-           return;
+            return;
         }
         String isbnOfReturningBook = getUserInput("Enter the isbn of the book : ");
         if (isValidISBN(isbnOfReturningBook)) {
-            ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(isbnOfReturningBook, isbnOfReturningBook);
-            returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
-            System.out.println("Book returned successfully");
+            try (CSVReader reader = new CSVReader(new FileReader(TRANSACTION_FILE_PATH))) {
+                String[] nextRecord;
+                while ((nextRecord = reader.readNext()) != null) {
+                    int borrowedUserId = Integer.parseInt(nextRecord[0]);
+                    String isbnOfBorrowedBook = nextRecord[1];
+                    if (borrowedUserId == userId && isbnOfBorrowedBook == isbnOfReturningBook) {
+                        ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(isbnOfReturningBook,
+                                isbnOfReturningBook);
+                        returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
+                        System.out.println("Book returned successfully");
+                    }
+                }
+            } catch (CsvValidationException e) {
+            }
+            catch(IOException e){
+                System.out.println("Error reading CSV file: " + e.getLocalizedMessage());
+            }
         } else {
             System.out.println("Entered isbn is invalid..! Please enter the valid isbn");
         }
