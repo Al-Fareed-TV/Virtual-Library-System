@@ -5,7 +5,6 @@ import com.opencsv.exceptions.CsvValidationException;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.opencsv.CSVReader;
 
@@ -24,7 +23,11 @@ public class Transaction {
 
     public static void main(String[] args) {
         Library library = initializeLibrary();
+        menu(library);
+        input.close();
+    }
 
+    private static void menu(Library library) {
         String option;
         do {
             System.out.println("** Library Menu **");
@@ -53,7 +56,6 @@ public class Transaction {
             }
         } while (!option.equals("0"));
 
-        input.close();
     }
 
     private static void searchBooksFlow(Library library) {
@@ -133,6 +135,8 @@ public class Transaction {
             return;
         }
 
+        BorrowedBooks borrowedBooksObject = new BorrowedBooks();
+
         if (hasUserBorrowedBook(userId, isbnOfReturningBook)) {
             Optional<Book> optionalBook = findBookByISBN(library, isbnOfReturningBook);
 
@@ -142,9 +146,11 @@ public class Transaction {
                 System.out.printf("Borrowing user: User ID %d%n", userId);
 
                 if (confirmAction("Proceed with the return (y/n):")) {
-                    processBookReturn(library, userId, isbnOfReturningBook, book.getTitle());
+                    processBookReturn(library, userId, isbnOfReturningBook, book.getTitle(), borrowedBooksObject);
+
                 } else {
                     System.out.println("Canceled return.");
+                    menu(library);
                 }
             } else {
                 System.out.println("Book with ISBN " + isbnOfReturningBook + " not found.");
@@ -154,8 +160,8 @@ public class Transaction {
         }
     }
 
-    private static void processBookReturn(Library library, int userId, String isbn, String title) {
-        BorrowedBooks borrowedBooksObject = new BorrowedBooks();
+    private static void processBookReturn(Library library, int userId, String isbn, String title,
+            BorrowedBooks borrowedBooksObject) {
         List<BorrowedBooks> borrowedBooks = borrowedBooksObject.getListOfBorrowedBooks();
 
         borrowedBooks.stream()
@@ -165,25 +171,40 @@ public class Transaction {
                 .findFirst()
                 .ifPresent(borrowedBook -> {
                     borrowedBook.setIsReturned();
-                    saveReturnedBookLog(userId, isbn, title);
+                    saveReturnedBookLog(userId, isbn, title, borrowedBooksObject);
                     System.out.println("Book returned successfully.");
                 });
     }
 
-    private static void saveReturnedBookLog(int userId, String isbn, String title) {
+    private static void saveReturnedBookLog(int userId, String isbn, String title, BorrowedBooks borrowedBooksObject) {
         ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(userId, isbn, title);
         returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
+
+        // Update the BorrowedBooks object to mark the book as returned
+        borrowedBooksObject.getListOfBorrowedBooks()
+                .stream()
+                .filter(borrowedBook -> borrowedBook.getUserId() == userId
+                        && borrowedBook.getIsbn().equalsIgnoreCase(isbn)
+                        && borrowedBook.getTitle().equalsIgnoreCase(title))
+                .findFirst()
+                .ifPresent(BorrowedBooks::setIsReturned);
+
+        // Save the changes to the CSV file
+        saveBorrowedBooksToFile(borrowedBooksObject.getListOfBorrowedBooks());
     }
 
-    private static boolean confirmReturn(String message) {
-        String userInput = getUserInput(message);
-        if (userInput.equalsIgnoreCase("y")) {
-            return true;
-        } else if (userInput.equalsIgnoreCase("n")) {
-            return false;
-        } else {
-            System.out.println("Invalid choice..");
-            return false;
+    private static void saveBorrowedBooksToFile(List<BorrowedBooks> borrowedBooks) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE_PATH))) {
+            for (BorrowedBooks books : borrowedBooks) {
+                writer.write(String.format("%s,%s,%s,%s,%s%n",
+                        books.getUserId(),
+                        books.getIsbn(),
+                        books.getTitle(),
+                        books.getBorrowDate(),
+                        books.getIsReturned()));
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving borrowed books to file: " + e.getMessage());
         }
     }
 
@@ -219,8 +240,8 @@ public class Transaction {
     }
 
     private static void saveTransaction(TransactionRecord transactionRecord) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE_PATH, true))) {
-            writer.write(String.format("%s,%s,%s,%s,%s",
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE_PATH, false))) {
+            writer.write(String.format("%s,%s,%s,%s,%s%n",
                     transactionRecord.getUserId(),
                     transactionRecord.getIsbn(),
                     transactionRecord.getTitle(),
