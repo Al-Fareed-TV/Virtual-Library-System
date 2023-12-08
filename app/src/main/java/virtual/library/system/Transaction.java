@@ -111,52 +111,52 @@ public class Transaction {
         }
     }
 
-    private static boolean hasUserBorrowedBook(int userId) {
-        return transaction.getUserId() == userId;
+    private static boolean hasUserBorrowedBook(int userId, String isbn) {
+        try (CSVReader reader = new CSVReader(new FileReader(TRANSACTION_FILE_PATH))) {
+            String[] nextRecord;
+            while ((nextRecord = reader.readNext()) != null) {
+                int borrowedUserId = Integer.parseInt(nextRecord[0]);
+                String borrowedIsbn = nextRecord[1];
+                if (borrowedUserId == userId && borrowedIsbn.equals(isbn)) {
+                    return true;
+                }
+            }
+        } catch (IOException | CsvValidationException e) {
+            System.out.println("Error reading CSV file: " + e.getMessage());
+        }
+        return false;
     }
 
     private static void returnBookFlow(Library library) throws CsvValidationException {
         int userId = Integer.parseInt(getUserInput("Enter the user id : "));
-        if (!hasUserBorrowedBook(userId)) {
-            System.out.println("Entered user id has not borrowed book..!");
-            return;
-        }
         String isbnOfReturningBook = getUserInput("Enter the isbn of the book : ");
-        //validates the ISBN of the book they are trying to return, checks whether the input of isbn is present in borrowed book .
-        if(!transaction.getIsbn().equals(isbnOfReturningBook)){
-            System.out.println("This user did not borrowed the book with isbn = "+isbnOfReturningBook+"\n Please enter the isbn of borrowed book..!");
+        if (!hasUserBorrowedBook(userId, isbnOfReturningBook)) {
+            System.out.println("Entered user id has not borrowed the book..!");
             return;
         }
-        if (isValidISBN(isbnOfReturningBook)) {
-            try (CSVReader reader = new CSVReader(new FileReader(TRANSACTION_FILE_PATH))) {
-                String[] nextRecord;
-                while ((nextRecord = reader.readNext()) != null) {
-                    int borrowedUserId = Integer.parseInt(nextRecord[0]);
-                    String isbnOfBorrowedBook = nextRecord[1];
-                    if (borrowedUserId == userId && isbnOfBorrowedBook == isbnOfReturningBook) {
-                        String userConfirmation = getUserInput("Are you sure want to return the book?(Y?N) :");
-                        if(userConfirmation.equalsIgnoreCase("y"))
-                       { ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(isbnOfReturningBook,
-                                isbnOfReturningBook);
-                        returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
-                        System.out.println("Book returned successfully");}
-                        else{
-                            System.out.println("Transaction cancelled..");
-                        }
-                    }
-                }
-            } catch (CsvValidationException e) {
-            }
-            catch(IOException e){
-                System.out.println("Error reading CSV file: " + e.getLocalizedMessage());
-            }
+        Optional<Book> optionalBook = findBookByISBN(library, isbnOfReturningBook);
+        String message = "Are you sure. Want to return the book?(y/n)";
+        if (optionalBook.isPresent() && confirmUser(message)) {
+            
+            String title = optionalBook.get().getTitle();
+            ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(userId, isbnOfReturningBook, title);
+            returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
+            System.out.println("Returned the book: " + title);
         } else {
-            System.out.println("Entered isbn is invalid..! Please enter the valid isbn");
+            System.out.println("Book with ISBN " + isbnOfReturningBook + " not found.");
         }
-
-        System.out.println("Returned the book");
     }
-
+    private static boolean confirmUser(String message){
+        String userInput = getUserInput(message);
+        if(userInput.equalsIgnoreCase("y")){
+            return true;
+        }else if(userInput.equalsIgnoreCase("n")){
+            return false;
+        }else{
+            System.out.println("Invalid choice..");
+            return false;
+        }
+    }
     private static void handleOutOfStockOptions(Library library) {
         System.out.println("Book is out of stock.");
         System.out.println("Options:");

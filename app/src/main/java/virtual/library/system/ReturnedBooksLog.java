@@ -2,15 +2,17 @@ package virtual.library.system;
 import java.time.LocalDate;
 import java.util.*;
 public class ReturnedBooksLog {
-    private String userId;
+    private int userId;
     private String isbn;
+    private String title;
     LocalDate returnedDate;
     List<ReturnedBooksLog> returnedBooksLog ;
-    public ReturnedBooksLog(String userId, String isbn) {
+    public ReturnedBooksLog(int userId, String isbn,String title) {
+        returnedBooksLog = new ArrayList<>(); 
         this.userId = userId;
         this.isbn = isbn;
+        this.title = title;
         this.returnedDate =  LocalDate.now();
-        returnedBooksLog = new ArrayList<>(); 
     }
     public void addReturnedBooksLog(ReturnedBooksLog booksLog){
         returnedBooksLog.add(booksLog);
