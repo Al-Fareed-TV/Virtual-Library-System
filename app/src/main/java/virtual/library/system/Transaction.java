@@ -93,7 +93,7 @@ public class Transaction {
                 if (optionalBook.isPresent()) {
                     Book book = optionalBook.get();
                     if (book.borrowBook()) {
-                        recordTransaction(userId, isbn);
+                        recordTransaction(userId,book.getTitle(),isbn);
                         System.out.println("Book issued...");
                     } else {
                         System.out.println(
@@ -111,17 +111,21 @@ public class Transaction {
         }
     }
 
-    private static boolean isUser(int userId) {
+    private static boolean hasUserBorrowedBook(int userId) {
         return transaction.getUserId() == userId;
     }
 
     private static void returnBookFlow(Library library) throws CsvValidationException {
         int userId = Integer.parseInt(getUserInput("Enter the user id : "));
-        if (!isUser(userId)) {
-            System.out.println("Entered user id doesnot exist..!");
+        if (!hasUserBorrowedBook(userId)) {
+            System.out.println("Entered user id has not borrowed book..!");
             return;
         }
         String isbnOfReturningBook = getUserInput("Enter the isbn of the book : ");
+        if(!transaction.getIsbn().equals(isbnOfReturningBook)){
+            System.out.println("This user did not borrowed the book with isbn = "+isbnOfReturningBook+"\n Please enter the isbn of borrowed book..!");
+            return;
+        }
         if (isValidISBN(isbnOfReturningBook)) {
             try (CSVReader reader = new CSVReader(new FileReader(TRANSACTION_FILE_PATH))) {
                 String[] nextRecord;
@@ -129,10 +133,15 @@ public class Transaction {
                     int borrowedUserId = Integer.parseInt(nextRecord[0]);
                     String isbnOfBorrowedBook = nextRecord[1];
                     if (borrowedUserId == userId && isbnOfBorrowedBook == isbnOfReturningBook) {
-                        ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(isbnOfReturningBook,
+                        String userConfirmation = getUserInput("Are you sure want to return the book?(Y?N) :");
+                        if(userConfirmation.equalsIgnoreCase("y"))
+                       { ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(isbnOfReturningBook,
                                 isbnOfReturningBook);
                         returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
-                        System.out.println("Book returned successfully");
+                        System.out.println("Book returned successfully");}
+                        else{
+                            System.out.println("Transaction cancelled..");
+                        }
                     }
                 }
             } catch (CsvValidationException e) {
@@ -172,9 +181,9 @@ public class Transaction {
                 .findFirst();
     }
 
-    private static void recordTransaction(int userId, String isbn) {
+    private static void recordTransaction(int userId, String title,String isbn) {
         LocalDate borrowingDate = LocalDate.now();
-        TransactionRecord transaction = new TransactionRecord(userId, isbn, borrowingDate);
+        TransactionRecord transaction = new TransactionRecord(userId, isbn,title ,borrowingDate);
         saveTransaction(transaction);
     }
 
@@ -182,6 +191,7 @@ public class Transaction {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE_PATH, true))) {
             writer.write(String.format("%s,%s,%s%n",
                     transaction.getUserId(), transaction.getIsbn(),
+                    transaction.getTitle(),
                     transaction.getBorrowingDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
         } catch (IOException e) {
             System.out.println("Error saving transaction: " + e.getMessage());

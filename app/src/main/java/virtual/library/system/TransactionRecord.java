@@ -4,6 +4,7 @@ public class TransactionRecord {
     private int userId;
     private LocalDate borrowedDate;
     private String isbn;
+    private String title;
     public TransactionRecord() {
     }
     public int getUserId() {
@@ -15,11 +16,14 @@ public class TransactionRecord {
     public String getIsbn() {
         return isbn;
     }
-    public TransactionRecord(int userId,String isbn, LocalDate borrowedDate ) {
+    public String getTitle(){
+        return title;
+    }
+    public TransactionRecord(int userId,String isbn, String title,LocalDate borrowedDate ) {
         this.userId = userId;
         this.borrowedDate = borrowedDate;
         this.isbn = isbn;
+        this.title = title;
     }
-    
     
 }
