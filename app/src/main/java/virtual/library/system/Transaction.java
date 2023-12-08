@@ -4,16 +4,16 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
 
 // This is transaction file
 
 public class Transaction {
     private static final Scanner input = new Scanner(System.in);
-    private static final String TRANSACTION_FILE_PATH = "app/src/main/resources/Transactions.csv";
+    private static final String TRANSACTION_FILE_PATH = "app/src/main/resources/BorrowedBooks.csv";
 
     private static boolean isValidISBN(String isbn) {
         return isbn.matches("[0-9-]+") && isbn.replaceAll("-", "").length() == 13;
@@ -24,7 +24,7 @@ public class Transaction {
 
     public static void main(String[] args) {
         Library library = initializeLibrary();
-        try{
+
         String option;
         do {
             System.out.println("** Library Menu **");
@@ -52,9 +52,6 @@ public class Transaction {
                     break;
             }
         } while (!option.equals("0"));
-    }catch(CsvValidationException e){
-        System.out.println("CSV validation");
-    }
 
         input.close();
     }
@@ -93,7 +90,7 @@ public class Transaction {
                 if (optionalBook.isPresent()) {
                     Book book = optionalBook.get();
                     if (book.borrowBook()) {
-                        recordTransaction(userId,book.getTitle(),isbn);
+                        recordTransaction(userId, book.getTitle(), isbn);
                         System.out.println("Book issued...");
                     } else {
                         System.out.println(
@@ -127,35 +124,69 @@ public class Transaction {
         return false;
     }
 
-    private static void returnBookFlow(Library library) throws CsvValidationException {
-        int userId = Integer.parseInt(getUserInput("Enter the user id : "));
-        String isbnOfReturningBook = getUserInput("Enter the isbn of the book : ");
-        if (!hasUserBorrowedBook(userId, isbnOfReturningBook)) {
-            System.out.println("Entered user id has not borrowed the book..!");
+    private static void returnBookFlow(Library library) {
+        int userId = Integer.parseInt(getUserInput("Enter your User ID:"));
+        String isbnOfReturningBook = getUserInput("Enter the ISBN of the book you wish to return:");
+
+        if (!isValidISBN(isbnOfReturningBook)) {
+            System.out.println("Invalid ISBN format. Please enter a valid ISBN.");
             return;
         }
-        Optional<Book> optionalBook = findBookByISBN(library, isbnOfReturningBook);
-        String message = "Are you sure. Want to return the book?(y/n)";
-        if (optionalBook.isPresent() && confirmReturn(message)) {
-            String title = optionalBook.get().getTitle();
-            ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(userId, isbnOfReturningBook, title);
-            returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
-            System.out.println("Returned the book: " + title);
+
+        if (hasUserBorrowedBook(userId, isbnOfReturningBook)) {
+            Optional<Book> optionalBook = findBookByISBN(library, isbnOfReturningBook);
+
+            if (optionalBook.isPresent()) {
+                Book book = optionalBook.get();
+                System.out.printf("Confirming return for book '%s' (ISBN: %s)%n", book.getTitle(), book.getIsbn());
+                System.out.printf("Borrowing user: User ID %d%n", userId);
+
+                if (confirmAction("Proceed with the return (y/n):")) {
+                    processBookReturn(library, userId, isbnOfReturningBook, book.getTitle());
+                } else {
+                    System.out.println("Canceled return.");
+                }
+            } else {
+                System.out.println("Book with ISBN " + isbnOfReturningBook + " not found.");
+            }
         } else {
-            System.out.println("Book with ISBN " + isbnOfReturningBook + " not found.");
+            System.out.println("You have not borrowed the book with ISBN " + isbnOfReturningBook + ".");
         }
     }
-    private static boolean confirmReturn(String message){
+
+    private static void processBookReturn(Library library, int userId, String isbn, String title) {
+        BorrowedBooks borrowedBooksObject = new BorrowedBooks();
+        List<BorrowedBooks> borrowedBooks = borrowedBooksObject.getListOfBorrowedBooks();
+
+        borrowedBooks.stream()
+                .filter(borrowedBook -> borrowedBook.getUserId() == userId
+                        && borrowedBook.getIsbn().equalsIgnoreCase(isbn)
+                        && !borrowedBook.getIsReturned())
+                .findFirst()
+                .ifPresent(borrowedBook -> {
+                    borrowedBook.setIsReturned();
+                    saveReturnedBookLog(userId, isbn, title);
+                    System.out.println("Book returned successfully.");
+                });
+    }
+
+    private static void saveReturnedBookLog(int userId, String isbn, String title) {
+        ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(userId, isbn, title);
+        returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
+    }
+
+    private static boolean confirmReturn(String message) {
         String userInput = getUserInput(message);
-        if(userInput.equalsIgnoreCase("y")){
+        if (userInput.equalsIgnoreCase("y")) {
             return true;
-        }else if(userInput.equalsIgnoreCase("n")){
+        } else if (userInput.equalsIgnoreCase("n")) {
             return false;
-        }else{
+        } else {
             System.out.println("Invalid choice..");
             return false;
         }
     }
+
     private static void handleOutOfStockOptions(Library library) {
         System.out.println("Book is out of stock.");
         System.out.println("Options:");
@@ -181,18 +212,20 @@ public class Transaction {
                 .findFirst();
     }
 
-    private static void recordTransaction(int userId, String title,String isbn) {
+    private static void recordTransaction(int userId, String title, String isbn) {
         LocalDate borrowingDate = LocalDate.now();
-        TransactionRecord transaction = new TransactionRecord(userId, isbn,title ,borrowingDate);
+        TransactionRecord transaction = new TransactionRecord(userId, isbn, title, borrowingDate);
         saveTransaction(transaction);
     }
 
-    private static void saveTransaction(TransactionRecord transaction) {
+    private static void saveTransaction(TransactionRecord transactionRecord) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE_PATH, true))) {
-            writer.write(String.format("%s,%s,%s%n",
-                    transaction.getUserId(), transaction.getIsbn(),
-                    transaction.getTitle(),
-                    transaction.getBorrowingDate().format(DateTimeFormatter.ISO_LOCAL_DATE)));
+            writer.write(String.format("%s,%s,%s,%s,%s",
+                    transactionRecord.getUserId(),
+                    transactionRecord.getIsbn(),
+                    transactionRecord.getTitle(),
+                    transactionRecord.getBorrowingDate(),
+                    transactionRecord.getIsReturnedStatus()));
         } catch (IOException e) {
             System.out.println("Error saving transaction: " + e.getMessage());
         }

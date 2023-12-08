@@ -73,8 +73,8 @@ public class Library {
             String[] nextRecord;
             while ((nextRecord = reader.readNext()) != null) {
                 if (isIsbnUnique(nextRecord[2])) {
-                    String author = nextRecord[0];
-                    String title = nextRecord[1];
+                    String title = nextRecord[0];
+                    String author = nextRecord[1];
                     String isbn = nextRecord[2];
                     String genre = nextRecord[3];
 
@@ -88,7 +88,6 @@ public class Library {
                     booksSkipped++;
                 }
             }
-
             booksUploadedAndSkipped(booksAdded, booksSkipped);
         } catch (IOException e) {
             System.out.println("Error reading CSV file: " + e.getLocalizedMessage());

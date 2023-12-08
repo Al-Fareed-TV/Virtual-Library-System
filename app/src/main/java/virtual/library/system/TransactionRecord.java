@@ -5,6 +5,7 @@ public class TransactionRecord {
     private LocalDate borrowedDate;
     private String isbn;
     private String title;
+    private boolean isReturned;
     public TransactionRecord() {
     }
     public int getUserId() {
@@ -24,6 +25,13 @@ public class TransactionRecord {
         this.borrowedDate = borrowedDate;
         this.isbn = isbn;
         this.title = title;
+        this.isReturned = false;
+    }
+    public void setIsReturned(){
+        this.isReturned = !(this.isReturned);
+    }
+    public boolean getIsReturnedStatus(){
+        return this.isReturned;
     }
     
 }
