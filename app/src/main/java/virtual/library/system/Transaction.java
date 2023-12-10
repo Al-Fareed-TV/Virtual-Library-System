@@ -177,7 +177,7 @@ public class Transaction {
     }
 
     private static void saveReturnedBookLog(int userId, String isbn, String title, BorrowedBooks borrowedBooksObject) {
-        ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(userId, isbn, title);
+        ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(userId, isbn);
         returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
 
         // Update the BorrowedBooks object to mark the book as returned
@@ -279,5 +279,13 @@ public class Transaction {
         System.out.print(prompt);
         String response = input.nextLine();
         return response.equalsIgnoreCase("y");
+    }
+    private static void viewReturnedBooksLog(){
+        ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog();
+        List<ReturnedBooksLog> booksReturned = returnedBooksLog.getReturnedBooksLogs();
+        System.out.printf("%-10s %-10s %-10s","USER ID","ISBN","RETURNED DATE");
+        for (ReturnedBooksLog books : booksReturned) {
+            System.out.printf("%-10s %-10s %-10s\n",books.getUserId(),books.getIsbn(),books.getReturnedDate());
+        }
     }
 }

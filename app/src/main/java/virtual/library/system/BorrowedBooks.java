@@ -66,7 +66,7 @@ public class BorrowedBooks {
     }
 
     public void setIsReturned() {
-        this.isReturned = !isReturned;
+        this.isReturned = !(isReturned);
     }
 
     public void addBorrowedBooks(BorrowedBooks books) {

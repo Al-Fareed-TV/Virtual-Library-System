@@ -4,14 +4,14 @@ import java.util.*;
 public class ReturnedBooksLog {
     private int userId;
     private String isbn;
-    private String title;
     LocalDate returnedDate;
     List<ReturnedBooksLog> returnedBooksLog ;
-    public ReturnedBooksLog(int userId, String isbn,String title) {
+    public ReturnedBooksLog() {
+    }
+    public ReturnedBooksLog(int userId, String isbn) {
         returnedBooksLog = new ArrayList<>(); 
         this.userId = userId;
         this.isbn = isbn;
-        this.title = title;
         this.returnedDate =  LocalDate.now();
     }
     public void addReturnedBooksLog(ReturnedBooksLog booksLog){
@@ -20,5 +20,15 @@ public class ReturnedBooksLog {
     public List<ReturnedBooksLog> getReturnedBooksLogs(){
         return returnedBooksLog;
     }
+    public int getUserId() {
+        return userId;
+    }
+    public String getIsbn() {
+        return isbn;
+    }
+    public LocalDate getReturnedDate() {
+        return returnedDate;
+    }
+    
     
 }
