@@ -13,7 +13,6 @@ import com.opencsv.CSVReader;
 public class Transaction {
     private static final Scanner input = new Scanner(System.in);
     private static final String TRANSACTION_FILE_PATH = "app/src/main/resources/BorrowedBooks.csv";
-    private static final String RETURNED_BOOKS_FILE_PATH = "app/src/main/resources/ReturnedBooks.csv";
 
     private static boolean isValidISBN(String isbn) {
         return isbn.matches("[0-9-]+") && isbn.replaceAll("-", "").length() == 13;
@@ -48,7 +47,7 @@ public class Transaction {
                 case "3":
                     returnBookFlow(library);
                     break;
-                
+
                 case "0":
                     System.out.println("Thank you for using the library system.");
                     break;
@@ -193,7 +192,6 @@ public class Transaction {
     // saves log of returning book
     private static void saveReturnedBookLog(int userId, String isbn, String title, BorrowedBooks borrowedBooksObject) {
         ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(userId, isbn);
-        returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
 
         // Update the BorrowedBooks object to mark the book as returned
         borrowedBooksObject.getListOfBorrowedBooks()
@@ -203,22 +201,7 @@ public class Transaction {
                         && borrowedBook.getTitle().equalsIgnoreCase(title))
                 .findFirst()
                 .ifPresent(BorrowedBooks::setIsReturned);
-
-        // Save the changes to the CSV file
-        saveBorrowedBooksToFile(returnedBooksLog.getReturnedBooksLogs());
-    }
-
-    private static void saveBorrowedBooksToFile(List<ReturnedBooksLog> returnedBooksLogs) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(RETURNED_BOOKS_FILE_PATH))) {
-            for (ReturnedBooksLog books : returnedBooksLogs) {
-                writer.write(String.format("%s,%s,%s,%s,%s%n",
-                        books.getUserId(),
-                        books.getIsbn(),
-                        books.getReturnedDate()));
-            }
-        } catch (IOException e) {
-            System.out.println("Error saving borrowed books to file: " + e.getMessage());
-        }
+        returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
     }
 
     private static void handleOutOfStockOptions(Library library) {
@@ -295,5 +278,5 @@ public class Transaction {
     }
 
     // this method prints the book that has been returned
-    
+
 }
