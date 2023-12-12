@@ -92,6 +92,10 @@ public class BorrowedBooks {
     }
 
     public List<BorrowedBooks> getListOfBorrowedBooks() {
-        return borrowedBooks;
+        try {
+            return getRecordOfListOfBorrowedBooks();
+        } catch (CsvValidationException e) {
+            return null;
+        }
     }
 }

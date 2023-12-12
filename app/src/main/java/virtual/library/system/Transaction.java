@@ -48,9 +48,7 @@ public class Transaction {
                 case "3":
                     returnBookFlow(library);
                     break;
-                case "4":
-                    viewReturnedBooksLog();
-                    break;
+                
                 case "0":
                     System.out.println("Thank you for using the library system.");
                     break;
@@ -146,10 +144,11 @@ public class Transaction {
 
             if (optionalBook.isPresent()) {
                 Book book = optionalBook.get();
-                // confirms the title of the book
                 System.out.printf("Book title : '%s'%n", book.getTitle());
+                // confirms the title of the book
                 if (confirmAction("Confirm the returing book title (y/n):")) {
                     System.out.printf("Borrowing user: User ID %d%n", userId);
+                    // confirms the borrowed user
                     if (confirmAction("Confirm the user with their ID (y/n): ")) {
                         if (confirmAction("Proceed with the returning book (y/n):")) {
                             processBookReturn(library, userId, isbnOfReturningBook, book.getTitle(),
@@ -159,17 +158,14 @@ public class Transaction {
                             System.out.println("Canceled return.");
                             menu(library);
                         }
-
                     } else {
                         System.out.println("Redirecting to Menu...");
                         menu(library);
                     }
-
                 } else {
                     System.out.println("Redirecting to Menu...");
                     menu(library);
                 }
-
             } else {
                 System.out.println("Book with ISBN " + isbnOfReturningBook + " not found.");
             }
@@ -299,12 +295,5 @@ public class Transaction {
     }
 
     // this method prints the book that has been returned
-    private static void viewReturnedBooksLog() {
-        ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog();
-        List<ReturnedBooksLog> booksReturned = returnedBooksLog.getReturnedBooksLogs();
-        System.out.printf("%-10s %-10s %-10s", "USER ID", "ISBN", "RETURNED DATE");
-        for (ReturnedBooksLog books : booksReturned) {
-            System.out.printf("%-10s %-10s %-10s\n", books.getUserId(), books.getIsbn(), books.getReturnedDate());
-        }
-    }
+    
 }
