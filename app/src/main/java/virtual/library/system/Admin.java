@@ -19,21 +19,26 @@ public class Admin {
         }
     }
 
-    public static boolean verifyAdmin() {
-        return true;
+    private boolean verifyAdmin() {
+        String username = getUserInput("Enter the username : ");
+        String password = getUserInput("Enter your password");
+        if(username == "admin123" && password == "adminPass123"){
+            return true;
+        }
+        return false;
     }
 
-    public boolean confirmUser(String prompt) {
+    private boolean confirmUser(String prompt) {
         System.out.println(prompt);
         return input.nextLine().equalsIgnoreCase("y");
     }
 
-    public String getUserInput(String message) {
+    private String getUserInput(String message) {
         System.out.println(message);
         return input.nextLine();
     }
 
-    public void proceedWithOperations() {
+    private void proceedWithOperations() {
         System.out.println("Operations:\n1.Add Books\n2.Delete Books\n3.View Borrowed Books\n4.Returned Books\n0.Exit");
         String optionsToSelectMessage = "Choose an option from above :";
         int adminSelectedOption = Integer.parseInt(getUserInput(optionsToSelectMessage));
