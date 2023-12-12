@@ -48,7 +48,7 @@ public class Transaction {
                 case "3":
                     returnBookFlow(library);
                     break;
-                    case "4":
+                case "4":
                     viewReturnedBooksLog();
                     break;
                 case "0":
@@ -146,16 +146,30 @@ public class Transaction {
 
             if (optionalBook.isPresent()) {
                 Book book = optionalBook.get();
-                System.out.printf("Confirming return for book '%s' (ISBN: %s)%n", book.getTitle(), book.getIsbn());
-                System.out.printf("Borrowing user: User ID %d%n", userId);
+                // confirms the title of the book
+                System.out.printf("Book title : '%s'%n", book.getTitle());
+                if (confirmAction("Confirm the returing book title (y/n):")) {
+                    System.out.printf("Borrowing user: User ID %d%n", userId);
+                    if (confirmAction("Confirm the user with their ID (y/n): ")) {
+                        if (confirmAction("Proceed with the returning book (y/n):")) {
+                            processBookReturn(library, userId, isbnOfReturningBook, book.getTitle(),
+                                    borrowedBooksObject);
 
-                if (confirmAction("Proceed with the return (y/n):")) {
-                    processBookReturn(library, userId, isbnOfReturningBook, book.getTitle(), borrowedBooksObject);
+                        } else {
+                            System.out.println("Canceled return.");
+                            menu(library);
+                        }
+
+                    } else {
+                        System.out.println("Redirecting to Menu...");
+                        menu(library);
+                    }
 
                 } else {
-                    System.out.println("Canceled return.");
+                    System.out.println("Redirecting to Menu...");
                     menu(library);
                 }
+
             } else {
                 System.out.println("Book with ISBN " + isbnOfReturningBook + " not found.");
             }
@@ -179,7 +193,8 @@ public class Transaction {
                     System.out.println("Book returned successfully.");
                 });
     }
-//saves log of returning book 
+
+    // saves log of returning book
     private static void saveReturnedBookLog(int userId, String isbn, String title, BorrowedBooks borrowedBooksObject) {
         ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog(userId, isbn);
         returnedBooksLog.addReturnedBooksLog(returnedBooksLog);
@@ -282,13 +297,14 @@ public class Transaction {
         String response = input.nextLine();
         return response.equalsIgnoreCase("y");
     }
+
     // this method prints the book that has been returned
-    private static void viewReturnedBooksLog(){
+    private static void viewReturnedBooksLog() {
         ReturnedBooksLog returnedBooksLog = new ReturnedBooksLog();
         List<ReturnedBooksLog> booksReturned = returnedBooksLog.getReturnedBooksLogs();
-        System.out.printf("%-10s %-10s %-10s","USER ID","ISBN","RETURNED DATE");
+        System.out.printf("%-10s %-10s %-10s", "USER ID", "ISBN", "RETURNED DATE");
         for (ReturnedBooksLog books : booksReturned) {
-            System.out.printf("%-10s %-10s %-10s\n",books.getUserId(),books.getIsbn(),books.getReturnedDate());
+            System.out.printf("%-10s %-10s %-10s\n", books.getUserId(), books.getIsbn(), books.getReturnedDate());
         }
     }
 }
